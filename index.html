@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Encoder/Decoder</title>
+    <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        textarea {
+            width: 80%;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        div {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Text Encoder/Decoder</h2>
+    <textarea id="inputText" placeholder="Enter text"></textarea><br>
+    <button onclick="toggleMode()">Toggle Mode</button>
+    <button onclick="processText()">Process</button>
+    <div id="result"></div>
+
+    <script>
+        var isEncodingMode = false;
+
+        function toggleMode() {
+            isEncodingMode = !isEncodingMode;
+            var modeButton = document.querySelector('#result');
+            modeButton.innerHTML = `Mode: ${isEncodingMode ? 'Encoding' : 'Decoding'}`;
+        }
+
+        function processText() {
+            var inputText = document.getElementById("inputText").value;
+            var resultElement = document.getElementById("result");
+
+            if (isEncodingMode) {
+                var base64Encoded = btoa(inputText);
+                var md5Hash = CryptoJS.MD5(inputText).toString(CryptoJS.enc.Hex);
+                var rot13Encoded = rot13(inputText);
+                var rot16Encoded = rot16(inputText);
+
+                var result = `
+                    <p><strong>Base64 Encoded:</strong> ${base64Encoded}</p>
+                    <p><strong>MD5 Hash:</strong> ${md5Hash}</p>
+                    <p><strong>ROT13 Encoded:</strong> ${rot13Encoded}</p>
+                    <p><strong>ROT16 Encoded:</strong> ${rot16Encoded}</p>
+                `;
+            } else {
+                var base64Decoded = atob(inputText);
+                var md5Hash = CryptoJS.MD5(inputText).toString(CryptoJS.enc.Hex);
+                var rot13Decoded = rot13(inputText);
+                var rot16Decoded = rot16(inputText);
+
+                var result = `
+                    <p><strong>Base64 Decoded:</strong> ${base64Decoded}</p>
+                    <p><strong>MD5 Hash:</strong> ${md5Hash}</p>
+                    <p><strong>ROT13 Decoded:</strong> ${rot13Decoded}</p>
+                    <p><strong>ROT16 Decoded:</strong> ${rot16Decoded}</p>
+                `;
+            }
+
+            resultElement.innerHTML = result;
+        }
+
+        function rot13(str) {
+            return str.replace(/[a-zA-Z]/g, function (c) {
+                return String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+            });
+        }
+
+        function rot16(str) {
+            return str.replace(/[a-zA-Z0-9]/g, function (c) {
+                var base = c <= "9" ? 48 : (c <= "Z" ? 65 : 97);
+                return String.fromCharCode(base + (c.charCodeAt(0) + 16 - base) % (c <= "9" ? 10 : 26));
+            });
+        }
+    </script>
+</body>
+</html>
